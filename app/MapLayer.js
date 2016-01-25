@@ -18,3 +18,16 @@ export const getProjection = (mapScale, mapWidth, mapHeight) => {
 	return projection;
 };
 
+export const pairShapes = (shapes, route) => {
+	const pairedShapes = [];
+	for (let i = 0; i < shapes.length - 2; i++) {
+		if (shapes[i].shape_dist_traveled > shapes[i + 1].shape_dist_traveled) {
+			break;
+		}
+		pairedShapes.push({
+			shape1: shapes[i],
+			shape2: shapes[i + 1]
+		});
+	}
+	return pairedShapes;
+};

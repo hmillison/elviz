@@ -57,8 +57,10 @@ const formatShapesByTrainLine = ({routes, trips, shapes}) => {
 		const currentRoute = _.find(routes, (route) => route.route_id === routeID);
 		const routeShapes = _.filter(trips, (trip) => trip.route_id === routeID);
 		const shapeIDs = routeShapes.map((shape) => shape.shape_id);
-		console.log(shapeIDs);
-		const shapesForRoute = _.filter(shapes, (shape) => _.indexOf(shapeIDs, shape.shape_id) !== -1);
+		let shapesForRoute = _.filter(shapes, (shape) => _.indexOf(shapeIDs, shape.shape_id) !== -1);
+		if (routeID === 'blue') {
+			shapesForRoute = shapesForRoute.slice(0, 600);
+		}
 		formattedShapes[routeID] = {
 			shapes: shapesForRoute,
 			route: currentRoute

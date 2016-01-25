@@ -2,11 +2,15 @@ import React from 'react';
 import d3 from 'd3';
 import ReactFauxDom from 'react-faux-dom';
 import { getProjection } from '../MapLayer.js';
+import { colorHash } from '../constants/colors.js';
 
 export default class Train extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.state = {
+			map: ReactFauxDom.createElement('svg')
+		};
 		this.render = this.render.bind(this);
 	}
 
@@ -19,8 +23,8 @@ export default class Train extends React.Component {
 			.attr('width', this.props.mapWidth)
 			.attr('height', this.props.mapHeight)
 			.append('g:circle')
-			.style('fill', '#2c3e50')
-			.style('stroke', '#95a5a6')
+			.style('fill', colorHash[this.props.routeName])
+			.style('stroke', '#ecf0f1')
 			.style('stroke-width', '2px')
 			.attr('cy', () => {
 				const coords = [this.props.lon, this.props.lat];
@@ -40,6 +44,7 @@ export default class Train extends React.Component {
 Train.propTypes = {
 	lat: React.PropTypes.string,
 	lon: React.PropTypes.string,
+	routeName: React.PropTypes.string,
 	mapScale: React.PropTypes.number,
 	mapWidth: React.PropTypes.number,
 	mapHeight: React.PropTypes.number

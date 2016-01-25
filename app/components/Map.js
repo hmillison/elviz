@@ -19,11 +19,12 @@ export default class Map extends React.Component {
 		this.renderTrains = this.renderTrains.bind(this);
 	}
 
-	renderTrains(train) {
+	renderTrains(train, trainGroup) {
 		return (
 			<Train
 				lat={_.first(train.lat)}
 				lon={_.first(train.lon)}
+				routeName={trainGroup.$.name}
 				{...this.state}
 			/>
 		);
@@ -69,7 +70,7 @@ export default class Map extends React.Component {
 					{...this.state}
 				/>
 				{ trains &&
-					trains.map((trainGroup) => trainGroup.train.map((train) => this.renderTrains(train)))
+					trains.map((trainGroup) => trainGroup.train.map((train) => this.renderTrains(train, trainGroup)))
 				}
 			</div>
 		);
@@ -104,6 +105,6 @@ Map.defaultProps = {
 export default connect(props => ({
 	trainsFetch: {
 		url: '/api/locations',
-		refreshInterval: 5000
+		refreshInterval: 1000
 	}
 }))(Map);

@@ -1,7 +1,8 @@
 import React from 'react';
 import d3 from 'd3';
 import ReactFauxDom from 'react-faux-dom';
-import { getProjection } from '../MapLayer.js';
+import { getProjection, pairShapes } from '../MapLayer.js';
+import { colorHash } from '../constants/colors.js';
 
 export default class TrainLine extends React.Component {
 	constructor(props) {
@@ -15,24 +16,32 @@ export default class TrainLine extends React.Component {
 
 		const map = ReactFauxDom.createElement('svg');
 
+		const pairedShapeData = pairShapes(this.props.shapes, this.props.route);
+
 		d3.select(map)
 			.attr('width', this.props.mapWidth)
 			.attr('height', this.props.mapHeight)
-			.selectAll('circle')
-  			.data(this.props.shapes)
-			.enter().append('g:circle')
-			.style('fill', `#${this.props.route.route_color}`)
+			.selectAll('line')
+  			.data(pairedShapeData)
+			.enter().append('g:line')
+			.style('stroke', colorHash[this.props.route.route_id.toLowerCase()])
 			.style('z-index', 0)
-			.attr('cy', (d) => {
-				const coords = [d.shape_pt_lon, d.shape_pt_lat];
+			.attr('y1', (d) => {
+				const coords = [d.shape1.shape_pt_lon, d.shape1.shape_pt_lat];
 				return projection(coords)[1];
 			})
-			.attr('cx', (d) => {
-				const coords = [d.shape_pt_lon, d.shape_pt_lat];
+			.attr('x1', (d) => {
+				const coords = [d.shape1.shape_pt_lon, d.shape1.shape_pt_lat];
 				return projection(coords)[0];
 			})
-			.attr('r', 4.5);
-
+			.attr('y2', (d) => {
+				const coords = [d.shape2.shape_pt_lon, d.shape2.shape_pt_lat];
+				return projection(coords)[1];
+			})
+			.attr('x2', (d) => {
+				const coords = [d.shape2.shape_pt_lon, d.shape2.shape_pt_lat];
+				return projection(coords)[0];
+			});
 
 		return map.toReact();
 	}
