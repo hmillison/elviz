@@ -1,43 +1,68 @@
 import React from 'react';
 import d3 from 'd3';
-import ReactFauxDom from 'react-faux-dom';
 import { getProjection } from '../MapLayer.js';
-import { colorHash } from '../constants/colors.js';
+import { colorHash } from '../styles/colors.js';
 
 export default class Train extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			map: ReactFauxDom.createElement('svg')
+		this.style = {
+			fill: colorHash[this.props.routeName],
+			stroke: '#ecf0f1',
+			strokeWidth: '2px'
 		};
+		this.projection = getProjection(this.props.mapScale, this.props.mapWidth, this.props.mapHeight);
 		this.render = this.render.bind(this);
 	}
 
-	render() {
-		const projection = getProjection(this.props.mapScale, this.props.mapWidth, this.props.mapHeight);
+	componentDidMount() {
+		d3.select(this.refs.trainDot)
+		.attr('cy', () => {
+			const coords = [this.props.lon, this.props.lat];
+			return this.projection(coords)[1];
+		})
+		.attr('cx', () => {
+			const coords = [this.props.lon, this.props.lat];
+			return this.projection(coords)[0];
+		})
+		.attr('r', 6);
+	}
 
-		const map = ReactFauxDom.createElement('svg');
+	shouldComponentUpdate(nextProps) {
+		if (nextProps.lon === this.props.lon && nextProps.lat === this.props.lat) {
+			return false;
+		}
+		return true;
+	}
 
-		d3.select(map)
-			.attr('width', this.props.mapWidth)
-			.attr('height', this.props.mapHeight)
-			.append('g:circle')
+	componentDidUpdate() {
+		d3.select(this.refs.trainDot)
+			.transition()
+			.duration(20000)
 			.style('fill', colorHash[this.props.routeName])
-			.style('stroke', '#ecf0f1')
-			.style('stroke-width', '2px')
 			.attr('cy', () => {
 				const coords = [this.props.lon, this.props.lat];
-				return projection(coords)[1];
+				return this.projection(coords)[1];
 			})
 			.attr('cx', () => {
 				const coords = [this.props.lon, this.props.lat];
-				return projection(coords)[0];
-			})
-			.attr('r', 6);
+				return this.projection(coords)[0];
+			});
+	}
 
-
-		return map.toReact();
+	render() {
+		return (
+			<svg
+				width={this.props.mapWidth}
+				height={this.props.mapHeight}
+			>
+				<circle
+					ref='trainDot'
+					style={this.style}
+				/>
+			</svg>
+		);
 	}
 }
 

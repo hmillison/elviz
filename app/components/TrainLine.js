@@ -1,49 +1,60 @@
 import React from 'react';
 import d3 from 'd3';
-import ReactFauxDom from 'react-faux-dom';
 import { getProjection, pairShapes } from '../MapLayer.js';
-import { colorHash } from '../constants/colors.js';
+import { colorHash } from '../styles/colors.js';
 
 export default class TrainLine extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.style = {
+			stroke: colorHash[this.props.route.route_id.toLowerCase()],
+			strokeWidth: '2px'
+		};
+		this.projection = getProjection(this.props.mapScale, this.props.mapWidth, this.props.mapHeight);
 		this.render = this.render.bind(this);
 	}
 
-	render() {
-		const projection = getProjection(this.props.mapScale, this.props.mapWidth, this.props.mapHeight);
-
-		const map = ReactFauxDom.createElement('svg');
-
+	componentDidMount() {
 		const pairedShapeData = pairShapes(this.props.shapes, this.props.route);
 
-		d3.select(map)
-			.attr('width', this.props.mapWidth)
-			.attr('height', this.props.mapHeight)
-			.selectAll('line')
-  			.data(pairedShapeData)
-			.enter().append('g:line')
-			.style('stroke', colorHash[this.props.route.route_id.toLowerCase()])
-			.style('z-index', 0)
-			.attr('y1', (d) => {
-				const coords = [d.shape1.shape_pt_lon, d.shape1.shape_pt_lat];
-				return projection(coords)[1];
-			})
-			.attr('x1', (d) => {
-				const coords = [d.shape1.shape_pt_lon, d.shape1.shape_pt_lat];
-				return projection(coords)[0];
-			})
-			.attr('y2', (d) => {
-				const coords = [d.shape2.shape_pt_lon, d.shape2.shape_pt_lat];
-				return projection(coords)[1];
-			})
-			.attr('x2', (d) => {
-				const coords = [d.shape2.shape_pt_lon, d.shape2.shape_pt_lat];
-				return projection(coords)[0];
-			});
+		d3.select(this.refs.svg)
+		.attr('width', this.props.mapWidth)
+		.attr('height', this.props.mapHeight)
+		.selectAll('line')
+		.data(pairedShapeData)
+		.enter().append('g:line')
+		.style(this.style)
+		.attr('y1', (d) => {
+			const coords = [d.shape1.shape_pt_lon, d.shape1.shape_pt_lat];
+			return this.projection(coords)[1];
+		})
+		.attr('x1', (d) => {
+			const coords = [d.shape1.shape_pt_lon, d.shape1.shape_pt_lat];
+			return this.projection(coords)[0];
+		})
+		.attr('y2', (d) => {
+			const coords = [d.shape2.shape_pt_lon, d.shape2.shape_pt_lat];
+			return this.projection(coords)[1];
+		})
+		.attr('x2', (d) => {
+			const coords = [d.shape2.shape_pt_lon, d.shape2.shape_pt_lat];
+			return this.projection(coords)[0];
+		});
+	}
 
-		return map.toReact();
+	shouldComponentUpdate() {
+		return false;
+	}
+
+	render() {
+		return (
+			<svg
+				width={this.props.mapWidth}
+				height={this.props.mapHeight}
+				ref='svg'
+			/>
+		);
 	}
 }
 

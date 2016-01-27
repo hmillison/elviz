@@ -31,7 +31,7 @@ export default class Map extends React.Component {
 	}
 
 	render() {
-		let trains = null
+		let trains = null;
 		if (this.props.trainsFetch.fulfilled) {
 			trains = this.props.trainsFetch.value;
 		}
@@ -40,14 +40,17 @@ export default class Map extends React.Component {
 				<TrainLine
 					{...this.props.Red}
 					{...this.state}
+					ref='red'
 				/>
 				<TrainLine
 					{...this.props.P}
 					{...this.state}
+					ref='purple'
 				/>
 				<TrainLine
 					{...this.props.Y}
 					{...this.state}
+					ref=''
 				/>
 				<TrainLine
 					{...this.props.Blue}
