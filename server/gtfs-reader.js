@@ -46,7 +46,6 @@ const csvToJSON = (file, callback) => {
 	const converter = new Converter({});
 	converter.fromFile(fileName, (err, result) => {
 		const parsedData = parsers[file](result);
-		writeDataToImportableFile(file, parsedData);
 		callback(null, [file, parsedData]);
 	});
 };

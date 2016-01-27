@@ -1,10 +1,10 @@
+const Router = require('express').Router;
 require('es6-promise').polyfill();
-import { Router } from 'express';
-import fetch from 'isomorphic-fetch';
-import xml2js from 'xml2js';
-import { ctaTrainTrackerAPIKey } from './keys';
+const fetch = require('isomorphic-fetch');
+const xml2js = require('xml2js');
+const ctaTrainTrackerAPIKey = require('./keys');
 
-export default function() {
+module.exports = () => {
 	const api = Router();
 
 	api.get('/', (req, res) => {
@@ -28,4 +28,4 @@ export default function() {
 	});
 
 	return api;
-}
+};
