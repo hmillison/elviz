@@ -8,7 +8,7 @@ var StatsPlugin = require('stats-webpack-plugin');
 
 module.exports = {
   entry: [
-    path.join(__dirname, 'app/main.js')
+    path.join(__dirname, 'app/main.js')  
   ],
   output: {
     path: path.join(__dirname, '/dist/'),
@@ -21,7 +21,6 @@ module.exports = {
       inject: 'body',
       filename: 'index.html'
     }),
-    new ExtractTextPlugin('[name]-[hash].min.css'),
     new webpack.optimize.UglifyJsPlugin({
       compressor: {
         warnings: false,
@@ -44,12 +43,6 @@ module.exports = {
     }, {
       test: /\.json?$/,
       loader: 'json'
-    }, {
-      test: /\.css$/,
-      loader: ExtractTextPlugin.extract('style', 'css?modules&localIdentName=[name]---[local]---[hash:base64:5]!postcss')
     }]
-  },
-  postcss: [
-    require('autoprefixer')
-  ]
+  }
 };
