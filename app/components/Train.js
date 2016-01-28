@@ -1,7 +1,9 @@
 import React from 'react';
 import d3 from 'd3';
-import { getProjection } from '../MapLayer.js';
-import { colorHash } from '../styles/colors.js';
+
+import { getProjection } from '../MapLayer';
+import { svgLayer } from '../styles/map';
+import { colorHash } from '../styles/colors';
 
 export default class Train extends React.Component {
 	constructor(props) {
@@ -38,17 +40,17 @@ export default class Train extends React.Component {
 
 	componentDidUpdate() {
 		d3.select(this.refs.trainDot)
-			.transition()
-			.duration(20000)
-			.style('fill', colorHash[this.props.routeName])
-			.attr('cy', () => {
-				const coords = [this.props.lon, this.props.lat];
-				return this.projection(coords)[1];
-			})
-			.attr('cx', () => {
-				const coords = [this.props.lon, this.props.lat];
-				return this.projection(coords)[0];
-			});
+		.transition()
+		.duration(1000)
+		.style('fill', colorHash[this.props.routeName])
+		.attr('cy', () => {
+			const coords = [this.props.lon, this.props.lat];
+			return this.projection(coords)[1];
+		})
+		.attr('cx', () => {
+			const coords = [this.props.lon, this.props.lat];
+			return this.projection(coords)[0];
+		});
 	}
 
 	render() {
@@ -56,6 +58,7 @@ export default class Train extends React.Component {
 			<svg
 				width={this.props.mapWidth}
 				height={this.props.mapHeight}
+				style={svgLayer}
 			>
 				<circle
 					ref='trainDot'

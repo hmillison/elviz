@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { trainLines } from './constants/trainlines';
 import Map from './components/Map';
 
 export default class App extends React.Component {
@@ -10,7 +9,7 @@ export default class App extends React.Component {
 
   render() {
 	return (
-	  <Map 	{...trainLines} />
+	  <Map />
 	);
   }
 }

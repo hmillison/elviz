@@ -1,5 +1,5 @@
 import React from 'react';
-import { connect } from 'react-refetch';
+import fetch from 'isomorphic-fetch';
 import _ from 'lodash';
 
 import TrainLine from './TrainLine';
@@ -12,16 +12,52 @@ export default class Map extends React.Component {
 		this.state = {
 			mapScale: 0.25,
 			mapWidth: window.innerWidth,
-			mapHeight: window.innerHeight
+			mapHeight: window.innerHeight,
+			trains: null,
+			trainLines: null
 		};
 
 		this.render = this.render.bind(this);
+		this.fetchTrainMap = this.fetchTrainMap.bind(this);
+		this.fetchTrains = this.fetchTrains.bind(this);
 		this.renderTrains = this.renderTrains.bind(this);
+		this.renderTrainLines = this.renderTrainLines.bind(this);
+	}
+
+	componentDidMount() {
+		this.fetchTrainMap();
+		window.setInterval(this.fetchTrains, 1000);
+	}
+
+	fetchTrainMap() {
+		fetch('/api/map')
+		.then((mapResponse) => {
+			return mapResponse.json();
+		})
+		.then((trainLinesJSON) => {
+			const trainLinesArray = _.values(trainLinesJSON);
+			this.setState({
+				trainLines: trainLinesArray
+			});
+		});
+	}
+
+	fetchTrains() {
+		fetch('/api/locations')
+		.then((locationsResponse) => {
+			return locationsResponse.json();
+		})
+		.then((trainLocationsJSON) => {
+			this.setState({
+				trains: trainLocationsJSON
+			});
+		});
 	}
 
 	renderTrains(train, trainGroup) {
 		return (
 			<Train
+				key={_.first(train.rn)}
 				lat={_.first(train.lat)}
 				lon={_.first(train.lon)}
 				routeName={trainGroup.$.name}
@@ -30,48 +66,23 @@ export default class Map extends React.Component {
 		);
 	}
 
+	renderTrainLines(trainLine) {
+		return (
+			<TrainLine
+				{...trainLine}
+				{...this.state}
+			/>
+		)
+	}
+
 	render() {
-		let trains = null;
-		if (this.props.trainsFetch.fulfilled) {
-			trains = this.props.trainsFetch.value;
-		}
+		const trainLines = this.state.trainLines;
+		const trains = this.state.trains;
 		return (
 			<div className='Map'>
-				<TrainLine
-					{...this.props.Red}
-					{...this.state}
-					ref='red'
-				/>
-				<TrainLine
-					{...this.props.P}
-					{...this.state}
-					ref='purple'
-				/>
-				<TrainLine
-					{...this.props.Y}
-					{...this.state}
-					ref=''
-				/>
-				<TrainLine
-					{...this.props.Blue}
-					{...this.state}
-				/>
-				<TrainLine
-					{...this.props.Pink}
-					{...this.state}
-				/>
-				<TrainLine
-					{...this.props.G}
-					{...this.state}
-				/>
-				<TrainLine
-					{...this.props.Brn}
-					{...this.state}
-				/>
-				<TrainLine
-					{...this.props.Org}
-					{...this.state}
-				/>
+				{ trainLines &&
+					trainLines.map((trainLine) => this.renderTrainLines(trainLine))
+				}
 				{ trains &&
 					trains.map((trainGroup) => trainGroup.train.map((train) => this.renderTrains(train, trainGroup)))
 				}
@@ -104,10 +115,3 @@ Map.defaultProps = {
 	Org: {},
 	trainsFetch: null
 };
-
-export default connect(props => ({
-	trainsFetch: {
-		url: '/api/locations',
-		refreshInterval: 1000
-	}
-}))(Map);

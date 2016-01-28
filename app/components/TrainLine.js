@@ -1,7 +1,9 @@
 import React from 'react';
 import d3 from 'd3';
-import { getProjection, pairShapes } from '../MapLayer.js';
-import { colorHash } from '../styles/colors.js';
+
+import { getProjection, pairShapes } from '../MapLayer';
+import { svgLayer } from '../styles/map';
+import { colorHash } from '../styles/colors';
 
 export default class TrainLine extends React.Component {
 	constructor(props) {
@@ -18,7 +20,7 @@ export default class TrainLine extends React.Component {
 	componentDidMount() {
 		const pairedShapeData = pairShapes(this.props.shapes, this.props.route);
 
-		d3.select(this.refs.svg)
+		d3.select(this.refs.trainLine)
 		.attr('width', this.props.mapWidth)
 		.attr('height', this.props.mapHeight)
 		.selectAll('line')
@@ -44,6 +46,7 @@ export default class TrainLine extends React.Component {
 	}
 
 	shouldComponentUpdate() {
+		// the train lines never change, no need to re-render
 		return false;
 	}
 
@@ -52,7 +55,8 @@ export default class TrainLine extends React.Component {
 			<svg
 				width={this.props.mapWidth}
 				height={this.props.mapHeight}
-				ref='svg'
+				style={svgLayer}
+				ref='trainLine'
 			/>
 		);
 	}

@@ -33,8 +33,6 @@
     "isomorphic-fetch": "^2.2.1",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
-    "react-faux-dom": "^2.1.1",
-    "react-refetch": "^0.6.0",
     "whatwg-fetch": "^0.10.1",
     "xml2js": "^0.4.16"
   },

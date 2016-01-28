@@ -36,8 +36,8 @@ const parsers = {
 };
 
 const writeDataToImportableFile = (fileName, data) => {
-	const formattedForFile = `export const ${fileName} = ${JSON.stringify(data, null, '\t')};`;
-	fs.writeFileSync(`app/constants/${fileName}.js`, formattedForFile);
+	const formattedForFile = `module.exports = const ${fileName} = ${JSON.stringify(data)};`;
+	fs.writeFileSync(`server/${fileName}.js`, formattedForFile);
 	return null;
 };
 
