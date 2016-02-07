@@ -14,7 +14,7 @@ export const getProjection = (mapScale, mapWidth, mapHeight) => {
 	projection
 		.scale(scale)
 		.translate(translate);
-
+		
 	return projection;
 };
 

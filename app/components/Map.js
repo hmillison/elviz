@@ -12,7 +12,7 @@ export default class Map extends React.Component {
 		super(props);
 
 		this.state = {
-			mapScale: 0.25,
+			mapScale: 0.15,
 			mapWidth: window.innerWidth,
 			mapHeight: window.innerHeight,
 			trains: null,
@@ -50,13 +50,15 @@ export default class Map extends React.Component {
 
 	render() {
 		const { trainLines, trains } = this.props;
-		const style = svgLayer;
+		const svgStyle = {
+			width: this.state.mapWidth,
+			height: this.state.mapWidth,
+			transform: 'rotate(5deg)'
+		};
 		return (
 			<div>
 				<svg
-					width={this.state.mapWidth}
-					height={this.state.mapHeight}
-					style={style}
+					style={svgStyle}
 				>
 					{ trainLines &&
 						trainLines.map((trainLine) => this.renderTrainLines(trainLine))
