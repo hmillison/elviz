@@ -1,5 +1,4 @@
 import React from 'react';
-import fetch from 'isomorphic-fetch';
 import _ from 'lodash';
 
 import { getProjection } from '../MapLayer';
@@ -22,41 +21,7 @@ export default class Map extends React.Component {
 
 		this.projection = getProjection(this.state.mapScale, this.state.mapWidth, this.state.mapHeight);
 
-		this.render = this.render.bind(this);
-		this.fetchTrainMap = this.fetchTrainMap.bind(this);
-		this.fetchTrains = this.fetchTrains.bind(this);
-		this.renderTrains = this.renderTrains.bind(this);
-		this.renderTrainLines = this.renderTrainLines.bind(this);
-	}
-
-	componentDidMount() {
-		this.fetchTrainMap();
-		window.setInterval(this.fetchTrains, 1000);
-	}
-
-	fetchTrainMap() {
-		fetch('/api/map')
-		.then((mapResponse) => {
-			return mapResponse.json();
-		})
-		.then((trainLinesJSON) => {
-			const trainLinesArray = _.values(trainLinesJSON);
-			this.setState({
-				trainLines: trainLinesArray
-			});
-		});
-	}
-
-	fetchTrains() {
-		fetch('/api/locations')
-		.then((locationsResponse) => {
-			return locationsResponse.json();
-		})
-		.then((trainLocationsJSON) => {
-			this.setState({
-				trains: trainLocationsJSON
-			});
-		});
+		_.bindAll(this, 'renderTrains', 'renderTrainLines');
 	}
 
 	renderTrains(train, trainGroup) {
@@ -75,6 +40,7 @@ export default class Map extends React.Component {
 	renderTrainLines(trainLine) {
 		return (
 			<TrainLine
+				key={trainLine.route.route_id}
 				{...trainLine}
 				projection={this.projection}
 				{...this.state}
@@ -83,8 +49,7 @@ export default class Map extends React.Component {
 	}
 
 	render() {
-		const trainLines = this.state.trainLines;
-		const trains = this.state.trains;
+		const { trainLines, trains } = this.props;
 		const style = svgLayer;
 		return (
 			<div>
@@ -107,25 +72,11 @@ export default class Map extends React.Component {
 }
 
 Map.propTypes = {
-	Red: React.PropTypes.object,
-	P: React.PropTypes.object,
-	Y: React.PropTypes.object,
-	Blue: React.PropTypes.object,
-	Pink: React.PropTypes.object,
-	G: React.PropTypes.object,
-	Brn: React.PropTypes.object,
-	Org: React.PropTypes.object,
-	trainsFetch: React.PropTypes.object
+	trainLines: React.PropTypes.array,
+	trains: React.PropTypes.array
 };
 
 Map.defaultProps = {
-	Red: {},
-	P: {},
-	Y: {},
-	Blue: {},
-	Pink: {},
-	G: {},
-	Brn: {},
-	Org: {},
-	trainsFetch: null
+	trainLines: [],
+	trains: []
 };

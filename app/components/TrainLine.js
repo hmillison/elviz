@@ -10,8 +10,6 @@ import Line from '../components/Line';
 export default class TrainLine extends React.Component {
 	constructor(props) {
 		super(props);
-
-		this.render = this.render.bind(this);
 	}
 
 	shouldComponentUpdate() {

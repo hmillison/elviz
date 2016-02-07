@@ -11,8 +11,6 @@ import Circle from '../components/Circle';
 export default class Train extends React.Component {
 	constructor(props) {
 		super(props);
-
-		this.render = this.render.bind(this);
 	}
 
 	componentWillReceiveProps(nextProps) {
