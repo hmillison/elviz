@@ -2,8 +2,11 @@ import React from 'react';
 import fetch from 'isomorphic-fetch';
 import _ from 'lodash';
 
-import TrainLine from './TrainLine';
-import Train from './Train';
+import { getProjection } from '../MapLayer';
+import { svgLayer } from '../styles/map';
+
+import TrainLine from '../components/TrainLine';
+import Train from '../components/Train';
 
 export default class Map extends React.Component {
 	constructor(props) {
@@ -16,6 +19,8 @@ export default class Map extends React.Component {
 			trains: null,
 			trainLines: null
 		};
+
+		this.projection = getProjection(this.state.mapScale, this.state.mapWidth, this.state.mapHeight);
 
 		this.render = this.render.bind(this);
 		this.fetchTrainMap = this.fetchTrainMap.bind(this);
@@ -61,6 +66,7 @@ export default class Map extends React.Component {
 				lat={_.first(train.lat)}
 				lon={_.first(train.lon)}
 				routeName={trainGroup.$.name}
+				projection={this.projection}
 				{...this.state}
 			/>
 		);
@@ -70,22 +76,30 @@ export default class Map extends React.Component {
 		return (
 			<TrainLine
 				{...trainLine}
+				projection={this.projection}
 				{...this.state}
 			/>
-		)
+		);
 	}
 
 	render() {
 		const trainLines = this.state.trainLines;
 		const trains = this.state.trains;
+		const style = svgLayer;
 		return (
-			<div className='Map'>
-				{ trainLines &&
-					trainLines.map((trainLine) => this.renderTrainLines(trainLine))
-				}
-				{ trains &&
-					trains.map((trainGroup) => trainGroup.train.map((train) => this.renderTrains(train, trainGroup)))
-				}
+			<div>
+				<svg
+					width={this.state.mapWidth}
+					height={this.state.mapHeight}
+					style={style}
+				>
+					{ trainLines &&
+						trainLines.map((trainLine) => this.renderTrainLines(trainLine))
+					}
+					{ trains &&
+						trains.map((trainGroup) => trainGroup.train.map((train) => this.renderTrains(train, trainGroup)))
+					}
+				</svg>
 			</div>
 		);
 	}

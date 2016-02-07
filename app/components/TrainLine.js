@@ -1,48 +1,17 @@
 import React from 'react';
-import d3 from 'd3';
+import _ from 'lodash';
 
-import { getProjection, pairShapes } from '../MapLayer';
-import { svgLayer } from '../styles/map';
+import { pairShapes } from '../MapLayer';
+import { trainLineOffsetHash } from '../styles/map';
 import { colorHash } from '../styles/colors';
+
+import Line from '../components/Line';
 
 export default class TrainLine extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.style = {
-			stroke: colorHash[this.props.route.route_id.toLowerCase()],
-			strokeWidth: '2px'
-		};
-		this.projection = getProjection(this.props.mapScale, this.props.mapWidth, this.props.mapHeight);
 		this.render = this.render.bind(this);
-	}
-
-	componentDidMount() {
-		const pairedShapeData = pairShapes(this.props.shapes, this.props.route);
-
-		d3.select(this.refs.trainLine)
-		.attr('width', this.props.mapWidth)
-		.attr('height', this.props.mapHeight)
-		.selectAll('line')
-		.data(pairedShapeData)
-		.enter().append('g:line')
-		.style(this.style)
-		.attr('y1', (d) => {
-			const coords = [d.shape1.shape_pt_lon, d.shape1.shape_pt_lat];
-			return this.projection(coords)[1];
-		})
-		.attr('x1', (d) => {
-			const coords = [d.shape1.shape_pt_lon, d.shape1.shape_pt_lat];
-			return this.projection(coords)[0];
-		})
-		.attr('y2', (d) => {
-			const coords = [d.shape2.shape_pt_lon, d.shape2.shape_pt_lat];
-			return this.projection(coords)[1];
-		})
-		.attr('x2', (d) => {
-			const coords = [d.shape2.shape_pt_lon, d.shape2.shape_pt_lat];
-			return this.projection(coords)[0];
-		});
 	}
 
 	shouldComponentUpdate() {
@@ -51,13 +20,37 @@ export default class TrainLine extends React.Component {
 	}
 
 	render() {
+		const pairedShapeData = pairShapes(this.props.shapes, this.props.route);
+		const lineStyle = {
+			stroke: colorHash[this.props.route.route_id.toLowerCase()],
+			strokeWidth: '2px'
+		};
+		const style = _.merge(lineStyle, trainLineOffsetHash[this.props.route.route_id.toLowerCase()]);
+
+		const lines = pairedShapeData.map((data) => {
+			const coords1 = [data.shape1.shape_pt_lon, data.shape1.shape_pt_lat];
+			const coords2 = [data.shape2.shape_pt_lon, data.shape2.shape_pt_lat];
+			const firstShapeProjection = this.props.projection(coords1);
+			const secondShapeProjection = this.props.projection(coords2);
+			const y1 = firstShapeProjection[1];
+			const x1 = firstShapeProjection[0];
+			const y2 = secondShapeProjection[1];
+			const x2 = secondShapeProjection[0];
+
+			return (
+				<Line
+					y1={y1}
+					x1={x1}
+					y2={y2}
+					x2={x2}
+					style={style}
+				/>
+			);
+		});
 		return (
-			<svg
-				width={this.props.mapWidth}
-				height={this.props.mapHeight}
-				style={svgLayer}
-				ref='trainLine'
-			/>
+			<g>
+				{ lines }
+			</g>
 		);
 	}
 }
@@ -67,7 +60,8 @@ TrainLine.propTypes = {
 	route: React.PropTypes.object,
 	mapScale: React.PropTypes.number,
 	mapWidth: React.PropTypes.number,
-	mapHeight: React.PropTypes.number
+	mapHeight: React.PropTypes.number,
+	projection: React.PropTypes.func.isRequired
 };
 
 TrainLine.defaultProps = {
