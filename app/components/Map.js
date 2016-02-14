@@ -1,11 +1,12 @@
 import React from 'react';
+import d3 from'd3';
 import _ from 'lodash';
 
 import { getProjection } from '../MapLayer';
-import { svgLayer } from '../styles/map';
 
 import TrainLine from '../components/TrainLine';
 import Train from '../components/Train';
+import Path from '../components/Path';
 
 export default class Map extends React.Component {
 	constructor(props) {
@@ -16,25 +17,44 @@ export default class Map extends React.Component {
 			mapWidth: window.innerWidth,
 			mapHeight: window.innerHeight,
 			trains: null,
-			trainLines: null
+			trainLines: null,
+			projection: null
 		};
 
-		this.projection = getProjection(this.state.mapScale, this.state.mapWidth, this.state.mapHeight);
+		this.state.projection = getProjection(this.state.mapScale, this.state.mapWidth, this.state.mapHeight);
 
+		// window.scale = () => {
+		// 	this.setState({
+		// 		mapScale: this.state.mapScale + 0.02
+		// 	});
+		// 	this.state.projection = getProjection(this.state.mapScale + 0.02, this.state.mapWidth, this.state.mapHeight);
+		// };
 		_.bindAll(this, 'renderTrains', 'renderTrainLines');
 	}
 
-	renderTrains(train, trainGroup) {
-		return (
-			<Train
-				key={_.first(train.rn)}
-				lat={_.first(train.lat)}
-				lon={_.first(train.lon)}
-				routeName={trainGroup.$.name}
-				projection={this.projection}
-				{...this.state}
-			/>
-		);
+	componentDidMount() {
+		const selection = d3.select(this.refs.Map);
+		const drag = d3.behavior.drag();
+		selection.call(drag);
+		drag.on('drag', () => {
+			console.log(d3.event.sourceEvent.pageX, d3.event.sourceEvent.pageY);
+			const projection = this.state.projection;
+		});
+	}
+
+	renderTrains(trainGroup) {
+		const trains = trainGroup.train ? trainGroup.train : [];
+		return trains.map((train) => {
+			return (
+				<Train
+					key={_.first(train.rn)}
+					lat={_.first(train.lat)}
+					lon={_.first(train.lon)}
+					routeName={trainGroup.$.name}
+					projection={this.state.projection}
+				/>
+			);
+		});
 	}
 
 	renderTrainLines(trainLine) {
@@ -42,8 +62,7 @@ export default class Map extends React.Component {
 			<TrainLine
 				key={trainLine.route.route_id}
 				{...trainLine}
-				projection={this.projection}
-				{...this.state}
+				projection={this.state.projection}
 			/>
 		);
 	}
@@ -58,13 +77,18 @@ export default class Map extends React.Component {
 		return (
 			<div>
 				<svg
+					ref='Map'
+					onDrag={this.onDrag}
 					style={svgStyle}
 				>
+					<Path
+						projection={this.state.projection}
+					/>
 					{ trainLines &&
 						trainLines.map((trainLine) => this.renderTrainLines(trainLine))
 					}
 					{ trains &&
-						trains.map((trainGroup) => trainGroup.train.map((train) => this.renderTrains(train, trainGroup)))
+						trains.map((trainGroup) => this.renderTrains(trainGroup))
 					}
 				</svg>
 			</div>

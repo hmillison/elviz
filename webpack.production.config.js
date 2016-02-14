@@ -7,20 +7,29 @@ var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var StatsPlugin = require('stats-webpack-plugin');
 
 module.exports = {
+  devtool: 'source-map',
   entry: [
     path.join(__dirname, 'app/main.js')  
   ],
   output: {
     path: path.join(__dirname, '/dist/'),
-    filename: '[name]-[hash].min.js'
+    filename: '[name].js',
+    publicPath: '/'
   },
   plugins: [
-    new webpack.optimize.OccurenceOrderPlugin(),
+    new webpack.DefinePlugin({
+      'process.env': {
+        'NODE_ENV': JSON.stringify('production')
+      }
+    }),
     new HtmlWebpackPlugin({
       template: 'app/index.tpl.html',
       inject: 'body',
       filename: 'index.html'
     }),
+    new webpack.optimize.DedupePlugin(),
+    new webpack.optimize.MinChunkSizePlugin({minChunkSize: 10000}),
+    new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({
       compressor: {
         warnings: false,
@@ -30,9 +39,6 @@ module.exports = {
     new StatsPlugin('webpack.stats.json', {
       source: false,
       modules: false
-    }),
-    new webpack.DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
     })
   ],
   module: {

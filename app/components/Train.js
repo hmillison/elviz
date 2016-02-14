@@ -18,7 +18,7 @@ export default class Train extends React.Component {
 			const trainDot = ReactDOM.findDOMNode(this.refs.trainDot);
 			d3.select(trainDot)
 			.transition()
-			.duration(1000)
+			.duration(5000)
 			.attr('cy', () => {
 				const coords = [nextProps.lon, nextProps.lat];
 				return this.props.projection(coords)[1];

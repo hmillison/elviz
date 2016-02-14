@@ -10,16 +10,7 @@
            // this is important for Webpack HMR:
            "locals": ["module"]
          }]
-         // note: you can put more transforms into array
-         // this is just one of them!
        }]]
-      },
-    "production": {
-      "plugins": [["react-transform", {
-         "transforms": [{
-           "imports": ["react"],
-         }]
-       }]]    
-     }
+      }
   }
 }
